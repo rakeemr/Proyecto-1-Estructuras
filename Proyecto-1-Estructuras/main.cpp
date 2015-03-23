@@ -105,8 +105,48 @@ struct homePersons{
     struct homePersons * next;
 }*firstHP;
 
+///--------------------------------End of Structures------------------------------///
+
+void insertSector(string type, string name, string trend, int percent){
+    struct Sector * nn = new Sector(t, n, tr, p);
+
+    if(firstS == NULL)
+        firstS = nn;
+    else{
+        struct Sector * temp = firstS;
+        while(temp -> next != NULL){
+            temp = temp -> next;
+        }
+        temp -> next = nn;
+    }
+
+}
+
+void insertEnergy(string name, int usagePercentage){
+    struct Energy * nn = new Energy(n, u);
+
+    if(firstE == NULL)
+        firstE = nn;
+    else{
+        struct Energy * temp = firstE;
+        while(temp -> next != NULL){
+            temp = temp -> next;
+        }
+        temp -> next = nn;
+    }
+}
+
+/*void insertLocality(string name, double energyIntake){
+    struct Locality * nn = new Locality(n, e);
+    if(firstL == NULL)
+        firstL = nn;
+    else{
+
+    }
+}*/
+
 int main()
 {
-
+    cout << "Contruction!!";
     return 0;
 }
