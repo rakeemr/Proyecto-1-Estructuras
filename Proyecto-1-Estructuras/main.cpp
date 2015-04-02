@@ -40,13 +40,11 @@ struct electricalDevices{
 struct Sector {
     string type;
     string name;
-    string trend;
     int percent;
     struct Sector * next;
-    Sector(string type, string name, string trend, int percent){
+    Sector(string type, string name, int percent){
         type = t;
         name = n;
-        trend = tr;
         percent = p;
         next = NULL;
     }
@@ -107,8 +105,8 @@ struct homePersons{
 
 ///--------------------------------End of Structures------------------------------///
 
-void insertSector(string type, string name, string trend, int percent){
-    struct Sector * nn = new Sector(t, n, tr, p);
+void insertSector(string type, string name,int percent){
+    struct Sector * nn = new Sector(t, n, p);
 
     if(firstS == NULL)
         firstS = nn;
@@ -141,7 +139,14 @@ void insertEnergy(string name, int usagePercentage){
     if(firstL == NULL)
         firstL = nn;
     else{
+        struct Locality * temp = firstL -> next;
+        struct Locality * ant = firstL;
 
+        while(temp -> next != firstL){
+            if(nn -> name > ant -> name){
+
+            }
+        }
     }
 }*/
 
