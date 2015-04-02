@@ -11,56 +11,7 @@ Begin Hour: 4:30 pm
 */
 ///-------------------------------------Declaration of the structures-----------------------------------------///
 
-struct Persons{
-    int id;
-    string name;
-    string lastName;
-    int age;
-    struct Persons *next;
-    struct Persons *bef;
-    Persons(int i, string n, string l, int a){
-        id = i;
-        name = n;
-        lastName = l;
-        age = a;
-        next = NULL;
-        bef = NULL;
-    }
-}*firstP;
-
-struct electricalDevices{
-    double kilowatts;
-    struct electricalDevices *next;
-    electricalDevices(double k){
-        kilowatts = k;
-        next = NULL;
-    }
-}*firstED;
-
-struct Sector {
-    string type;
-    string name;
-    int percent;
-    struct Sector * next;
-    Sector(string type, string name, int percent){
-        type = t;
-        name = n;
-        percent = p;
-        next = NULL;
-    }
-}*firstS;
-
-struct Energy{
-    string name;
-    int usagePercentage;
-    struct Energy * next;
-    Energy(string name, int usagePercentage){
-        name = n;
-        usagePercentage = u;
-        next = NULL;
-    }
-}*firstE;
-
+// Main list's group structures
 struct Locality{
     string name;
     double energyIntake;
@@ -86,6 +37,25 @@ struct Home{
     }
 };
 
+struct Persons{
+    int id;
+    string name;
+    string lastName;
+    int age;
+    char intakeStandar;
+    struct Persons *next;
+    struct Persons *bef;
+    Persons(int i, string n, string l, int a, char i){
+        id = i;
+        name = n;
+        lastName = l;
+        age = a;
+        intakeStandar = i;
+        next = NULL;
+        bef = NULL;
+    }
+}*firstP;
+
 struct Intake{
     struct Intake * next;
     struct electricalDevices * linkED;
@@ -93,17 +63,69 @@ struct Intake{
     struct Sector * linkS;
 };
 
-struct localitySector{
-    struct Sector * linkS;
-    struct localitySector * next;
-}*firstLS;
+struct Sector {
+    string type;
+    string name;
+    int percent;
+    struct Sector * next;
+    Sector(string type, string name, int percent){
+        type = t;
+        name = n;
+        percent = p;
+        next = NULL;
+    }
+}*firstS;
+
+struct electricalDevices{
+    double kilowatts;
+    struct electricalDevices *next;
+    electricalDevices(double k){
+        kilowatts = k;
+        next = NULL;
+    }
+}*firstED;
+
+struct Energy{
+    string name;
+    int usagePercentage;
+    struct Energy * next;
+    Energy(string name, int usagePercentage){
+        name = n;
+        usagePercentage = u;
+        next = NULL;
+    }
+}*firstE;
+
+// Sublist's group structures
+struct localityHome{
+    struct Home * linkS;
+    struct localityHome * next;
+}*firstLH;
 
 struct homePersons{
     struct Persons * linkP;
     struct homePersons * next;
 }*firstHP;
 
-///--------------------------------End of Structures------------------------------///
+struct personsIntake{
+    struct Intake * linkI;
+    struct personsIntake * next;
+}*firstPI;
+
+struct localitySector{
+    struct Sector * linkS;
+    struct localitySector * next;
+}*firstLS;
+
+struct intakeElectricalDevicesEnergySector{
+    struct electricalDevices * linkED;
+    struct Energy * linkE;
+    struct Sector * linkS;
+    struct intakeElectricalDevicesEnergySector * next;
+}*firstIEDES;
+
+
+///--------------------------------End of Structures ------------------------------///
 
 void insertSector(string type, string name,int percent){
     struct Sector * nn = new Sector(t, n, p);
