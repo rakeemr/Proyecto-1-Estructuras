@@ -30,9 +30,9 @@ struct Home{
     string address;
     struct Home * next;
     struct Intake * linkI;
-    Home(string code, string address){
-        code = code;
-        address = address;
+    Home(string c, string ad){
+        code = c;
+        address = ad;
         next = NULL;
     }
 };
@@ -68,10 +68,10 @@ struct Sector {
     string name;
     int percent;
     struct Sector * next;
-    Sector(string type, string name, int percent){
-        type = type;
-        name = name;
-        percent = percent;
+    Sector(string t, string n, int p){
+        type = t;
+        name = n;
+        percent = p;
         next = NULL;
     }
 }*firstS;
@@ -89,9 +89,9 @@ struct Energy{
     string name;
     int usagePercentage;
     struct Energy * next;
-    Energy(string name, int usagePercentage){
-        name = name;
-        usagePercentage = usagePercentage;
+    Energy(string n, int uP){
+        name = n;
+        usagePercentage = uP;
         next = NULL;
     }
 }*firstE;
@@ -129,16 +129,15 @@ struct intakeElectricalDevicesEnergySector{
 bool isAlphabeticallyGreaterThan(struct Locality * nn, struct Locality * temp, int i){
     int x = nn -> name[i];
     int y = temp -> name[i];
-    //  s > a
+
     if (x > y){
         return false;
     }else if(x < y){
         return true;
-    }else if(x = y){
+    }else if(x == y){
         isAlphabeticallyGreaterThan(nn, temp, i+1);
     }
 }
-
 
 void insertLocality(string name, double energyIntake){
     struct Locality * nn = new Locality(name, energyIntake);
@@ -147,8 +146,6 @@ void insertLocality(string name, double energyIntake){
         firstL = nn;
         nn -> next = nn;
     }else{
-        //Search field to which insert.
-
         struct Locality * temp = firstL;
 
         bool alphaOrder = true; // only to initialice.
@@ -177,6 +174,20 @@ void insertLocality(string name, double energyIntake){
     }
 }
 
+void insertSector(string type, string name,int percent){
+    struct Sector * nn = new Sector(type, name, percent);
+
+    if(firstS == NULL)
+        firstS = nn;
+    else{
+        struct Sector * temp = firstS;
+        while(temp -> next != NULL){
+            temp = temp -> next;
+        }
+        temp -> next = nn;
+    }
+}
+
 // In process....
 void insertElectricalDevices(string name, double energyIntake){
     struct Locality * nn = new Locality(name, energyIntake);
@@ -192,20 +203,6 @@ void insertElectricalDevices(string name, double energyIntake){
         }while(temp -> next != firstL);
         temp -> next = nn;
         firstL = nn;
-    }
-}
-
-void insertSector(string type, string name,int percent){
-    struct Sector * nn = new Sector(type, name, percent);
-
-    if(firstS == NULL)
-        firstS = nn;
-    else{
-        struct Sector * temp = firstS;
-        while(temp -> next != NULL){
-            temp = temp -> next;
-        }
-        temp -> next = nn;
     }
 }
 
@@ -263,22 +260,31 @@ int main()
 
     cout << "The character '" << c << "' has an ASCII code of " << x << endl;
 
-    //insertLocality("alajuela", 5.0);
-    //insertLocality("san jose", 5.0);
-    //insertLocality("cartago", 5.0);
-    //insertLocality("puntarenas", 5.0);
-    //insertLocality("limon", 5.0);
-    insertLocality("Agustin", 5.0);
-    insertLocality("Adrian", 5.0);
-    insertLocality("Ahmed", 5.0);
-    insertLocality("Adur", 5.0);
-    insertLocality("Aaron", 5.0);
+    insertLocality("Alajuela", 5.0);
+    insertLocality("San jose", 5.0);
+    insertLocality("Cartago", 5.0);
+    insertLocality("Puntarenas", 5.0);
+    insertLocality("Limon", 5.0);
+    insertLocality("San Carlos", 5.0);
+    insertLocality("Palmera", 5.0);
+    insertLocality("Marina", 5.0);
+    insertLocality("Aguas Zarcas", 5.0);
+    insertLocality("Florencia", 5.0);
+    insertLocality("Fortuna", 5.0);
+
     /*
     Aarón 	27
 Adrian 	100
 Adur 	26
 Agustín 	118
 Ahmed 	16
+Aimar 	137
+Aitor 	407
+Alain 	59
+Alberto 	236
+Alejandro 	127
+Alex 	42
+Alexander
 */
     cout<<"\n\n";
     printLocality();
