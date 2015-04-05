@@ -132,10 +132,10 @@ bool isAlphabeticallyGreaterThan(struct Locality * nn, struct Locality * temp, i
     //  s > a
     if (x > y){
         return false;
+    }else if(x < y){
+        return true;
     }else if(x = y){
         isAlphabeticallyGreaterThan(nn, temp, i+1);
-    }else{
-        return true;
     }
 }
 
@@ -147,31 +147,33 @@ void insertLocality(string name, double energyIntake){
         firstL = nn;
         nn -> next = nn;
     }else{
-
-        //Busqueda del campo a donde insertar.
+        //Search field to which insert.
 
         struct Locality * temp = firstL;
 
         bool alphaOrder = true; // only to initialice.
+        int j = 0;
 
         do{
             alphaOrder = isAlphabeticallyGreaterThan(nn, temp, 0);
+            struct Locality * bef = temp;
 
             if (alphaOrder){
+                nn -> next = temp;
+                do{
+                    bef = bef -> next;
+                }while(bef -> next != temp);
+                bef -> next = nn;
+                if(j==0)
+                    firstL = nn;
+            }else if(temp -> next == firstL){
                 nn -> next = temp -> next;
-                temp ->next = nn;
+                temp -> next = nn;
+                alphaOrder = true;
             }
             temp = temp ->next;
+            j++;
         }while(alphaOrder == false);
-
-        /*
-        nn -> next = firstL;
-        do{
-            temp = temp -> next;
-        }while(temp -> next != firstL);
-        temp -> next = nn;
-        firstL = nn;
-        */
     }
 }
 
@@ -261,11 +263,24 @@ int main()
 
     cout << "The character '" << c << "' has an ASCII code of " << x << endl;
 
-    insertLocality("alajuela", 5.0);
-    insertLocality("san jose", 5.0);
-    insertLocality("cartago", 5.0);
-    insertLocality("puntarenas", 5.0);
-    insertLocality("limon", 5.0);
+    //insertLocality("alajuela", 5.0);
+    //insertLocality("san jose", 5.0);
+    //insertLocality("cartago", 5.0);
+    //insertLocality("puntarenas", 5.0);
+    //insertLocality("limon", 5.0);
+    insertLocality("Agustin", 5.0);
+    insertLocality("Adrian", 5.0);
+    insertLocality("Ahmed", 5.0);
+    insertLocality("Adur", 5.0);
+    insertLocality("Aaron", 5.0);
+    /*
+    Aarón 	27
+Adrian 	100
+Adur 	26
+Agustín 	118
+Ahmed 	16
+*/
+    cout<<"\n\n";
     printLocality();
     return 0;
 }
