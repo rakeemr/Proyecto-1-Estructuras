@@ -176,6 +176,23 @@ void insertLocality(string name, double energyIntake){
             temp = temp ->next;
             j++;
         }while(alphaOrder == false);
+<<<<<<< HEAD
+=======
+    }
+}
+
+void insertSector(string type, string name,int percent){
+    struct Sector * nn = new Sector(type, name, percent);
+
+    if(firstS == NULL)
+        firstS = nn;
+    else{
+        struct Sector * temp = firstS;
+        while(temp -> next != NULL){
+            temp = temp -> next;
+        }
+        temp -> next = nn;
+>>>>>>> origin/master
     }
 }
 
@@ -193,20 +210,6 @@ void insertElectricalDevices(string name, double killowats, int intakeEnergyPerH
         }while(temp -> next != firstED);
         temp -> next = nn;
         firstED = nn;
-    }
-}
-
-void insertSector(string type, string name,int percent){
-    struct Sector * nn = new Sector(type, name, percent);
-
-    if(firstS == NULL)
-        firstS = nn;
-    else{
-        struct Sector * temp = firstS;
-        while(temp -> next != NULL){
-            temp = temp -> next;
-        }
-        temp -> next = nn;
     }
 }
 
@@ -319,7 +322,11 @@ int main()
     cout << "The character '" << c << "' has an ASCII code of " << x << endl;
 
     insertLocality("Alajuela", 5.0);
+<<<<<<< HEAD
     insertLocality("San Jose", 5.0);
+=======
+    insertLocality("San jose", 5.0);
+>>>>>>> origin/master
     insertLocality("Cartago", 5.0);
     insertLocality("Puntarenas", 5.0);
     insertLocality("Limon", 5.0);
@@ -330,6 +337,23 @@ int main()
     insertLocality("Florencia", 5.0);
     insertLocality("Fortuna", 5.0);
 
+<<<<<<< HEAD
+=======
+    /*
+    Aarón 	27
+Adrian 	100
+Adur 	26
+Agustín 	118
+Ahmed 	16
+Aimar 	137
+Aitor 	407
+Alain 	59
+Alberto 	236
+Alejandro 	127
+Alex 	42
+Alexander
+*/
+>>>>>>> origin/master
     cout<<"\n\n";
     printLocality();
 
