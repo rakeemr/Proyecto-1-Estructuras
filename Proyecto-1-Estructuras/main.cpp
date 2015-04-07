@@ -25,14 +25,15 @@ struct Locality{
     }
 }*firstL;
 
+// se supone no deberia existir, se crea para ser sublista
 struct Home{
     string code;
     string address;
     struct Home * next;
     struct Intake * linkI;
-    Home(string code, string address){
-        code = code;
-        address = address;
+    Home(string c, string ad){
+        code = c;
+        address = ad;
         next = NULL;
     }
 };
@@ -50,7 +51,7 @@ struct Persons{
         name = n;
         lastName = l;
         age = a;
-        intakeStandar = s;
+        //intakeStandar = s;
         next = NULL;
         bef = NULL;
     }
@@ -68,19 +69,23 @@ struct Sector {
     string name;
     int percent;
     struct Sector * next;
-    Sector(string type, string name, int percent){
-        type = type;
-        name = name;
-        percent = percent;
+    Sector(string t, string n, int p){
+        type = t;
+        name = n;
+        percent = p;
         next = NULL;
     }
 }*firstS;
 
 struct electricalDevices{
+    string name;
     double kilowatts;
+    int intakeEnergyPerHour;
     struct electricalDevices *next;
-    electricalDevices(double k){
+    electricalDevices(string n,double k, int i){
+        name = n;
         kilowatts = k;
+        intakeEnergyPerHour = i;
         next = NULL;
     }
 }*firstED;
@@ -89,9 +94,9 @@ struct Energy{
     string name;
     int usagePercentage;
     struct Energy * next;
-    Energy(string name, int usagePercentage){
-        name = name;
-        usagePercentage = usagePercentage;
+    Energy(string n, int uP){
+        name = n;
+        usagePercentage = uP;
         next = NULL;
     }
 }*firstE;
@@ -129,16 +134,15 @@ struct intakeElectricalDevicesEnergySector{
 bool isAlphabeticallyGreaterThan(struct Locality * nn, struct Locality * temp, int i){
     int x = nn -> name[i];
     int y = temp -> name[i];
-    //  s > a
+
     if (x > y){
         return false;
-    }else if(x = y){
-        isAlphabeticallyGreaterThan(nn, temp, i+1);
-    }else{
+    }else if(x < y){
         return true;
+    }else if(x == y){
+        isAlphabeticallyGreaterThan(nn, temp, i+1);
     }
 }
-
 
 void insertLocality(string name, double energyIntake){
     struct Locality * nn = new Locality(name, energyIntake);
@@ -147,49 +151,48 @@ void insertLocality(string name, double energyIntake){
         firstL = nn;
         nn -> next = nn;
     }else{
-
-        //Busqueda del campo a donde insertar.
-
         struct Locality * temp = firstL;
 
         bool alphaOrder = true; // only to initialice.
+        int j = 0;
 
         do{
             alphaOrder = isAlphabeticallyGreaterThan(nn, temp, 0);
+            struct Locality * bef = temp;
 
             if (alphaOrder){
+                nn -> next = temp;
+                do{
+                    bef = bef -> next;
+                }while(bef -> next != temp);
+                bef -> next = nn;
+                if(j==0)
+                    firstL = nn;
+            }else if(temp -> next == firstL){
                 nn -> next = temp -> next;
-                temp ->next = nn;
+                temp -> next = nn;
+                alphaOrder = true;
             }
             temp = temp ->next;
+            j++;
         }while(alphaOrder == false);
-
-        /*
-        nn -> next = firstL;
-        do{
-            temp = temp -> next;
-        }while(temp -> next != firstL);
-        temp -> next = nn;
-        firstL = nn;
-        */
     }
 }
 
-// In process....
-void insertElectricalDevices(string name, double energyIntake){
-    struct Locality * nn = new Locality(name, energyIntake);
+void insertElectricalDevices(string name, double killowats, int intakeEnergyPerHour){
+    struct electricalDevices * nn = new electricalDevices(name, killowats, intakeEnergyPerHour);
 
-    if(firstL == NULL){ //Its the first
-        firstL = nn;
+    if(firstED == NULL){ //Its the first
+        firstED = nn;
         nn -> next = nn;
     }else{
-        struct Locality * temp = firstL;
-        nn -> next = firstL;
+        struct electricalDevices * temp = firstED;
+        nn -> next = firstED;
         do{
             temp = temp -> next;
-        }while(temp -> next != firstL);
+        }while(temp -> next != firstED);
         temp -> next = nn;
-        firstL = nn;
+        firstED = nn;
     }
 }
 
@@ -221,21 +224,31 @@ void insertEnergy(string name, int usagePercentage){
     }
 }
 
-/*void insertLocality(string name, double energyIntake){
-    struct Locality * nn = new Locality(n, e);
-    if(firstL == NULL)
-        firstL = nn;
+void insertPerson(int id, string name, string lastName, int age, char intakeStandar){
+    struct Persons * nn = new Persons(id, name, lastName, age, intakeStandar);
+    if(firstP == NULL)
+        firstP = nn;
     else{
-        struct Locality * temp = firstL -> next;
-        struct Locality * ant = firstL;
-
-        while(temp -> next != firstL){
-            if(nn -> name > ant -> name){
-
-            }
+        struct Persons * actually = firstP;
+        struct Persons * bef = NULL;
+        while((actually !=NULL)&&(id > actually->id)){
+            bef = actually;
+            actually = actually -> next;
+        }if(actually == NULL){   // insert at the final list
+            bef -> next = nn;
+            nn -> bef = bef;
+        }else if(bef == NULL){    // insert in the begin
+            nn -> next = firstP;
+            firstP -> bef = nn;
+            firstP = nn;
+        }else{   // insert in the middle
+            bef -> next = nn;
+            actually -> bef = nn;
+            nn -> next = actually;
+            nn -> bef = bef;
         }
     }
-}*/
+}
 
 void printLocality(){
 	struct Locality * temp = firstL;
@@ -251,6 +264,50 @@ void printLocality(){
 	}
 }
 
+void printElectricalDevices(){
+	struct electricalDevices * temp = firstED;
+
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+        do{
+			cout<< temp ->name <<", ";
+			cout<< temp ->kilowatts <<", ";
+			cout<< temp ->intakeEnergyPerHour <<", \n";
+
+			temp = temp->next;
+		}while(temp!=firstED);
+	}
+}
+
+void printEnergy(){
+	struct Energy * temp = firstE;
+
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+            	cout<< temp -> name <<", ";
+            	cout<< temp -> usagePercentage <<", \n";
+	    }
+	}
+}
+
+void printPersons(){
+	struct Persons * temp = firstP;
+
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+            	cout<< temp -> name <<", ";
+                cout<< temp -> lastName <<", ";
+            	cout<< temp -> age <<", ";
+            	cout<< temp -> intakeStandar <<" \n";
+	    }
+	}
+}
 
 int main()
 {
@@ -261,11 +318,41 @@ int main()
 
     cout << "The character '" << c << "' has an ASCII code of " << x << endl;
 
-    insertLocality("alajuela", 5.0);
-    insertLocality("san jose", 5.0);
-    insertLocality("cartago", 5.0);
-    insertLocality("puntarenas", 5.0);
-    insertLocality("limon", 5.0);
+    insertLocality("Alajuela", 5.0);
+    insertLocality("San Jose", 5.0);
+    insertLocality("Cartago", 5.0);
+    insertLocality("Puntarenas", 5.0);
+    insertLocality("Limon", 5.0);
+    insertLocality("San Carlos", 5.0);
+    insertLocality("Palmera", 5.0);
+    insertLocality("Marina", 5.0);
+    insertLocality("Aguas Zarcas", 5.0);
+    insertLocality("Florencia", 5.0);
+    insertLocality("Fortuna", 5.0);
+
+    cout<<"\n\n";
     printLocality();
+
+    //Pruebas en el main
+    insertElectricalDevices("Licuadora",34.9,45);
+    insertElectricalDevices("Lavadora",12.5,1245);
+    insertElectricalDevices("Refrigeradora",21.2,124);
+    insertElectricalDevices("Horno Microndas",57.1,34);
+    insertElectricalDevices("Televisor",86.4,43);
+    insertElectricalDevices("Computador",36.9,67);
+
+    cout<<"\n\n";
+    printElectricalDevices();
+
+    insertPerson(2098, "Hola", "Bsd", 14, 'A');
+    insertPerson(2003, "Mundo", "Bsd", 15, 'B');
+    insertPerson(2002, "soy", "Bsd", 16, 'C');
+    insertPerson(2000, "xD ", "Bsd", 17, 'D');
+    insertPerson(1999, "Yo", "Bsd", 18, 'E');
+    insertPerson(2001, "Tu", "Bsd", 19, 'F');
+    insertPerson(2045, "Aasd", "Bsd", 20, 'G');
+
+    cout<<"\n\n";
+    printPersons();
     return 0;
 }
