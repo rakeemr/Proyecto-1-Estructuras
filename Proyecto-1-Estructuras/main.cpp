@@ -29,12 +29,12 @@ struct Locality{
     }
 }*firstL;
 
-// se supone no deberia existir, se crea para ser sublista
 struct Home{
     int code;
     string address;
     struct Home * next;
-    struct Intake * linkI;
+    struct Intake * firstI;
+    struct homePersons * linkHP;
     Home(int c, string ad){
         code = c;
         address = ad;
@@ -50,22 +50,31 @@ struct Persons{
     char intakeStandar;
     struct Persons *next;
     struct Persons *bef;
+    struct personsIntake * linkPI;
     Persons(int i, string n, string l, int a, char s){
         id = i;
         name = n;
         lastName = l;
         age = a;
-        //intakeStandar = s;
+        intakeStandar = s;
         next = NULL;
         bef = NULL;
     }
 }*firstP;
 
 struct Intake{
+    int id;
+    string month;
+    int intakeEnergy;
     struct Intake * next;
-    struct electricalDevices * linkED;
-    struct Energy * linkE;
-    struct Sector * linkS;
+    struct electricalDevices * firstED;
+    struct intakeEnergySector * linkIES;
+    Intake(int i, string m, int iE){
+        id = i;
+        month = m;
+        intakeEnergy = iE;
+        next = NULL;
+    }
 };
 
 struct Sector {
@@ -84,29 +93,19 @@ struct Sector {
 }*firstS;
 
 struct electricalDevices{
-<<<<<<< HEAD
     int id;
-=======
->>>>>>> origin/master
     string name;
     double kilowatts;
     int intakeEnergyPerHour;
     struct electricalDevices *next;
-<<<<<<< HEAD
-    electricalDevices(int i, string n,double k, int iEPH){
+    electricalDevices(int i, string n, double k, int iEPH){
         id = i;
         name = n;
         kilowatts = k;
         intakeEnergyPerHour = iEPH;
-=======
-    electricalDevices(string n,double k, int i){
-        name = n;
-        kilowatts = k;
-        intakeEnergyPerHour = i;
->>>>>>> origin/master
         next = NULL;
     }
-}*firstED;
+};
 
 struct Energy{
     int id;
@@ -121,33 +120,28 @@ struct Energy{
     }
 }*firstE;
 
-// Sublist's group structures
-struct localityHome{
-    struct Home * linkS;
-    struct localityHome * next;
-}*firstLH;
+///------------------------ Declaration of Sublist's Structures ---------------------///
 
 struct homePersons{
     struct Persons * linkP;
     struct homePersons * next;
-}*firstHP;
+};
 
 struct personsIntake{
     struct Intake * linkI;
     struct personsIntake * next;
-}*firstPI;
+};
 
 struct localitySector{
     struct Sector * linkS;
     struct localitySector * next;
-}*firstLS;
+};
 
-struct intakeElectricalDevicesEnergySector{
-    struct electricalDevices * linkED;
+struct intakeEnergySector{
     struct Energy * linkE;
     struct Sector * linkS;
-    struct intakeElectricalDevicesEnergySector * next;
-}*firstIEDES;
+    struct intakeEnergySector * next;
+};
 
 ///------------------------ Declaration of Apparence's Methods----------------------///
 
@@ -208,12 +202,7 @@ void insertLocality(int id, string name, double energyIntake){
             temp = temp ->next;
             j++;
         }while(alphaOrder == false);
-<<<<<<< HEAD
         cout<<"Data Insert Correctly!\n";
-=======
-<<<<<<< HEAD
-=======
->>>>>>> origin/master
     }
 }
 
@@ -228,18 +217,13 @@ void insertSector(int id, string type, string name,int percent){
             temp = temp -> next;
         }
         temp -> next = nn;
->>>>>>> origin/master
     }
     cout<<"Data Insert Correctly!\n";
 }
 
-<<<<<<< HEAD
+// insertar sin servir no existe firstED, debido a correcion de codigo
 void insertElectricalDevices(int id, string name, double killowats, int intakeEnergyPerHour){
     struct electricalDevices * nn = new electricalDevices(id, name, killowats, intakeEnergyPerHour);
-=======
-void insertElectricalDevices(string name, double killowats, int intakeEnergyPerHour){
-    struct electricalDevices * nn = new electricalDevices(name, killowats, intakeEnergyPerHour);
->>>>>>> origin/master
 
     if(firstED == NULL){ //Its the first
         firstED = nn;
