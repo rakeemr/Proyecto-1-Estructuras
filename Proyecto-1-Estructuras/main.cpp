@@ -1,11 +1,13 @@
 #include <iostream>
+#include <stdlib.h>
 
 using namespace std;
 ///---------------------------------------------INFORMATION-----------------------------------------------------///
 /*
 Starting Date: March 09
-Creators: Raquel Mora Rojas
-          Andrés Garcia Salas
+Creators: Andrés Garcia Salas
+          Raquel Mora Rojas
+
 
 Begin Hour: 4:30 pm
 */
@@ -13,24 +15,27 @@ Begin Hour: 4:30 pm
 
 // Main list's group structures
 struct Locality{
+    int id;
     string name;
     double energyIntake;
     struct Locality *next;
-    struct Home * linkH;
+    struct Home * firstH;
     struct localitySector * linkLS;
-    Locality(string n, double eI){
+    Locality(int i,string n, double eI){
+        id = i;
         name = n;
         energyIntake = eI;
         next = NULL;
     }
 }*firstL;
 
+// se supone no deberia existir, se crea para ser sublista
 struct Home{
-    string code;
+    int code;
     string address;
     struct Home * next;
     struct Intake * linkI;
-    Home(string c, string ad){
+    Home(int c, string ad){
         code = c;
         address = ad;
         next = NULL;
@@ -64,11 +69,13 @@ struct Intake{
 };
 
 struct Sector {
+    int id;
     string type;
     string name;
     int percent;
     struct Sector * next;
-    Sector(string t, string n, int p){
+    Sector(int i, string t, string n, int p){
+        id = i;
         type = t;
         name = n;
         percent = p;
@@ -77,19 +84,27 @@ struct Sector {
 }*firstS;
 
 struct electricalDevices{
+    int id;
+    string name;
     double kilowatts;
+    int intakeEnergyPerHour;
     struct electricalDevices *next;
-    electricalDevices(double k){
+    electricalDevices(int i, string n,double k, int iEPH){
+        id = i;
+        name = n;
         kilowatts = k;
+        intakeEnergyPerHour = iEPH;
         next = NULL;
     }
 }*firstED;
 
 struct Energy{
+    int id;
     string name;
     int usagePercentage;
     struct Energy * next;
-    Energy(string n, int uP){
+    Energy(int i, string n, int uP){
+        id = i;
         name = n;
         usagePercentage = uP;
         next = NULL;
@@ -124,8 +139,20 @@ struct intakeElectricalDevicesEnergySector{
     struct intakeElectricalDevicesEnergySector * next;
 }*firstIEDES;
 
+///------------------------ Declaration of Apparence's Methods----------------------///
 
-///--------------------------------End of Structures ------------------------------///
+void insertMenu();
+void insertMenuCout();
+void reportMenu();
+void reportMenuCout();
+void consultMenu();
+void consultMenuCout();
+void mainMenuCout();
+void mainMenu();
+
+///-------------------------------- End of Structures ------------------------------///
+
+///-------------------------------- Insert Methods ---------------------------------///
 bool isAlphabeticallyGreaterThan(struct Locality * nn, struct Locality * temp, int i){
     int x = nn -> name[i];
     int y = temp -> name[i];
@@ -139,8 +166,8 @@ bool isAlphabeticallyGreaterThan(struct Locality * nn, struct Locality * temp, i
     }
 }
 
-void insertLocality(string name, double energyIntake){
-    struct Locality * nn = new Locality(name, energyIntake);
+void insertLocality(int id, string name, double energyIntake){
+    struct Locality * nn = new Locality(id, name, energyIntake);
 
     if(firstL == NULL){ //Its the first
         firstL = nn;
@@ -171,11 +198,12 @@ void insertLocality(string name, double energyIntake){
             temp = temp ->next;
             j++;
         }while(alphaOrder == false);
+        cout<<"Data Insert Correctly!\n";
     }
 }
 
-void insertSector(string type, string name,int percent){
-    struct Sector * nn = new Sector(type, name, percent);
+void insertSector(int id, string type, string name,int percent){
+    struct Sector * nn = new Sector(id, type, name, percent);
 
     if(firstS == NULL)
         firstS = nn;
@@ -186,28 +214,29 @@ void insertSector(string type, string name,int percent){
         }
         temp -> next = nn;
     }
+    cout<<"Data Insert Correctly!\n";
 }
 
-// In process....
-void insertElectricalDevices(string name, double energyIntake){
-    struct Locality * nn = new Locality(name, energyIntake);
+void insertElectricalDevices(int id, string name, double killowats, int intakeEnergyPerHour){
+    struct electricalDevices * nn = new electricalDevices(id, name, killowats, intakeEnergyPerHour);
 
-    if(firstL == NULL){ //Its the first
-        firstL = nn;
+    if(firstED == NULL){ //Its the first
+        firstED = nn;
         nn -> next = nn;
     }else{
-        struct Locality * temp = firstL;
-        nn -> next = firstL;
+        struct electricalDevices * temp = firstED;
+        nn -> next = firstED;
         do{
             temp = temp -> next;
-        }while(temp -> next != firstL);
+        }while(temp -> next != firstED);
         temp -> next = nn;
-        firstL = nn;
+        firstED = nn;
     }
+    cout<<"Data Insert Correctly!\n";
 }
 
-void insertEnergy(string name, int usagePercentage){
-    struct Energy * nn = new Energy(name, usagePercentage);
+void insertEnergy(int id, string name, int usagePercentage){
+    struct Energy * nn = new Energy(id, name, usagePercentage);
 
     if(firstE == NULL)
         firstE = nn;
@@ -218,23 +247,134 @@ void insertEnergy(string name, int usagePercentage){
         }
         temp -> next = nn;
     }
+    cout<<"Data Insert Correctly!\n";
 }
 
-/*void insertLocality(string name, double energyIntake){
-    struct Locality * nn = new Locality(n, e);
-    if(firstL == NULL)
-        firstL = nn;
+void insertPerson(int id, string name, string lastName, int age, char intakeStandar){
+    struct Persons * nn = new Persons(id, name, lastName, age, intakeStandar);
+    if(firstP == NULL)
+        firstP = nn;
     else{
-        struct Locality * temp = firstL -> next;
-        struct Locality * ant = firstL;
-
-        while(temp -> next != firstL){
-            if(nn -> name > ant -> name){
-
-            }
+        struct Persons * actually = firstP;
+        struct Persons * bef = NULL;
+        while((actually !=NULL)&&(id > actually->id)){
+            bef = actually;
+            actually = actually -> next;
+        }if(actually == NULL){   // insert at the final list
+            bef -> next = nn;
+            nn -> bef = bef;
+        }else if(bef == NULL){    // insert in the begin
+            nn -> next = firstP;
+            firstP -> bef = nn;
+            firstP = nn;
+        }else{   // insert in the middle
+            bef -> next = nn;
+            actually -> bef = nn;
+            nn -> next = actually;
+            nn -> bef = bef;
         }
     }
-}*/
+    cout<<"Data Insert Correctly!\n";
+}
+///--------------------------------- Searches ----------------------------///
+
+struct Locality * searchL (int id){
+    struct Locality * temp = firstL;
+
+    if(firstL == NULL)
+        return NULL;
+    do{
+        if(temp -> id == id)
+            return temp;
+        temp = temp -> next;
+    }while(temp != firstL);
+
+    return NULL;
+};
+
+struct  Home * searchH (string nameLocality, int searchCode){
+    struct Locality * tempL = searchL(nameLocality);
+    struct Home * temp = tempL -> firstH;
+
+    if((tempL  == NULL)||(temp  == NULL))
+        return NULL;
+    for (;temp != NULL; temp = temp -> next){
+        if(temp -> code == searchCode)
+            return temp;
+    }
+    return NULL;
+};
+
+struct  Persons * searchP (int id){
+    struct Persons * temp = firstP;
+
+    if(firstP == NULL)
+        return NULL;
+    for (;temp != NULL; temp = temp -> next){
+        if(temp -> id == id)
+            return temp;
+    }
+    return NULL;
+};
+
+struct  Sector * searchS (int id){
+    struct Sector * temp = firstS;
+
+    if(firstS == NULL)
+        return NULL;
+    for (;temp != NULL; temp = temp -> next){
+        if(temp -> id == id)
+            return temp;
+    }
+    return NULL;
+};
+
+struct  Energy * searchE (int id){
+    struct Energy * temp = firstE;
+
+    if(firstS == NULL)
+        return NULL;
+    for (;temp != NULL; temp = temp -> next){
+        if(temp -> id == id)
+            return temp;
+    }
+    return NULL;
+};
+
+struct  electricalDevices * searchED (int id){
+    struct electricalDevices * temp = firstED;
+
+    if(firstED == NULL)
+        return NULL;
+    for (;temp != NULL; temp = temp -> next){
+        if(temp -> id == id)
+            return temp;
+    }
+    return NULL;
+};
+
+///------------------------------- End of Searches -------------------------///
+
+///------------------------------- Relation Methods ------------------------///
+
+void localitySectorRelation(int idLocality, int idSector){
+    struct Locality * local = searchL(idLocality);
+    struct Sector * sect = searchS(idSector);
+
+    if (local == NULL){
+        cout<<"Locality doesn't found!";
+        return;
+    }else if (sect == NULL){
+        cout<<"Sector doesn't found!";
+        return;
+    }
+
+
+}
+
+
+
+///------------------------------- Output Methods ------------------------///
 
 void printLocality(){
 	struct Locality * temp = firstL;
@@ -244,49 +384,256 @@ void printLocality(){
 	else{
 
 		do{
+            cout<< temp -> id <<", ";
 			cout<< temp ->name <<", \n";
 			temp = temp->next;
 		}while(temp!=firstL);
 	}
 }
 
+void printElectricalDevices(){
+	struct electricalDevices * temp = firstED;
 
-int main()
-{
-    cout << "Contruction!!";
-    char c = 'A';
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+        do{
+            cout<< temp -> id <<", ";
+			cout<< temp ->name <<", ";
+			cout<< temp ->kilowatts <<", ";
+			cout<< temp ->intakeEnergyPerHour <<", \n";
 
-    int x = c; // Look ma! No cast!
+			temp = temp->next;
+		}while(temp!=firstED);
+	}
+}
 
-    cout << "The character '" << c << "' has an ASCII code of " << x << endl;
+void printEnergy(){
+	struct Energy * temp = firstE;
 
-    insertLocality("Alajuela", 5.0);
-    insertLocality("San jose", 5.0);
-    insertLocality("Cartago", 5.0);
-    insertLocality("Puntarenas", 5.0);
-    insertLocality("Limon", 5.0);
-    insertLocality("San Carlos", 5.0);
-    insertLocality("Palmera", 5.0);
-    insertLocality("Marina", 5.0);
-    insertLocality("Aguas Zarcas", 5.0);
-    insertLocality("Florencia", 5.0);
-    insertLocality("Fortuna", 5.0);
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+            	cout<< temp -> name <<", ";
+            	cout<< temp -> usagePercentage <<", \n";
+	    }
+	}
+}
 
-    /*
-    Aarón 	27
-Adrian 	100
-Adur 	26
-Agustín 	118
-Ahmed 	16
-Aimar 	137
-Aitor 	407
-Alain 	59
-Alberto 	236
-Alejandro 	127
-Alex 	42
-Alexander
-*/
+void printPersons(){
+	struct Persons * temp = firstP;
+
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+            	cout<< temp -> name <<", ";
+                cout<< temp -> lastName <<", ";
+            	cout<< temp -> age <<", ";
+            	cout<< temp -> intakeStandar <<" \n";
+	    }
+	}
+}
+
+void loadData(){
+    insertLocality(1,"San Jose", 5.0);
+    insertLocality(2,"Alajuela", 5.0);
+    insertLocality(3,"San Jose", 5.0);
+    insertLocality(4,"Cartago", 5.0);
+    insertLocality(5,"Puntarenas", 5.0);
+    insertLocality(6,"Limon", 5.0);
+    insertLocality(7,"San Carlos", 5.0);
+    insertLocality(8,"Palmera", 5.0);
+    insertLocality(9,"Marina", 5.0);
+    insertLocality(10,"Aguas Zarcas", 5.0);
+    insertLocality(11,"Florencia", 5.0);
+    insertLocality(12,"Fortuna", 5.0);
     cout<<"\n\n";
-    printLocality();
+    //Pruebas en el main
+    insertElectricalDevices(1,"Licuadora",34.9,45);
+    insertElectricalDevices(2,"Lavadora",12.5,1245);
+    insertElectricalDevices(3,"Refrigeradora",21.2,124);
+    insertElectricalDevices(4,"Horno Microndas",57.1,34);
+    insertElectricalDevices(5,"Televisor",86.4,43);
+    insertElectricalDevices(6,"Computador",36.9,67);
+    cout<<"\n\n";
+    insertPerson(2098, "Hola", "Bsd", 14, 'A');
+    insertPerson(2003, "Mundo", "Bsd", 15, 'B');
+    insertPerson(2002, "soy", "Bsd", 16, 'C');
+    insertPerson(2000, "xD ", "Bsd", 17, 'D');
+    insertPerson(1999, "Yo", "Bsd", 18, 'E');
+    insertPerson(2001, "Tu", "Bsd", 19, 'F');
+    insertPerson(2045, "Aasd", "Bsd", 20, 'G');
+}
+//-------------------------------------Aparience Methods--------------------------------
+void mainMenuCout(){
+    cout<<"\t\t Main Menu\n"<<endl;
+	cout<<"-------------------------------------------"<<endl;
+	cout<<"1. Insert Menu."<<endl;
+    cout<<"2. Edit Electrical Devices."<<endl;
+    cout<<"3. Delete Persons."<<endl;
+    cout<<"4. Consult Menu."<<endl;
+    cout<<"5. Report Menu."<<endl;
+    cout<<"0. Exit."<<endl;
+    cout<<"-------------------------------------------"<<endl;
+	cout<<"Choose an Option: ";
+}
+
+void reportMenuCout(){
+    cout<<"\t\t Report Menu\n"<<endl;
+    cout<<"-------------------------------------------"<<endl;
+    cout<<"1. % Intakes per Sector."<<endl;
+    cout<<"2. % Intakes per Electrical Devices."<<endl;
+    cout<<"3. % Intakes of Energy Sources per month."<<endl;
+    cout<<"4. Classification Localities in Energy Consumption."<<endl;
+    cout<<"5. Classification Persons in Energy Consumption."<<endl;
+    cout<<"6. Electrical Devices in descending order according to Home intake."<<endl;
+    cout<<"7. Descending localities in total consumption."<<endl;
+    cout<<"0. Back."<<endl;
+    cout<<"-------------------------------------------"<<endl;
+    cout<<"Choose an Option: ";
+}
+
+void consultMenuCout(){
+    cout<<"\t\t Consult Menu\n"<<endl;
+    cout<<"-------------------------------------------"<<endl;
+    cout<<"1. Consult the monthly consumption of the any device 'X' in a locality 'Y'."<<endl;
+    cout<<"2. Consult most used Energy Source in a locality."<<endl;
+    cout<<"3. Consult in a home, who is the most consumer person."<<endl;
+    cout<<"0. Back."<<endl;
+    cout<<"-------------------------------------------"<<endl;
+    cout<<"Choose an Option: ";
+}
+
+void insertMenuCout(){
+    cout<<"\t\t Insert Menu\n"<<endl;
+	cout<<"-------------------------------------------"<<endl;
+	cout<<"1. Insert Locality."<<endl;
+	cout<<"2. Insert Home."<<endl;
+	cout<<"3. Insert Person."<<endl;
+	cout<<"4. Insert Sector."<<endl;
+	cout<<"5. Insert Electrical Devices."<<endl;
+	cout<<"6. Insert Energy."<<endl;
+	cout<<"0. Back."<<endl;
+	cout<<"-------------------------------------------"<<endl;
+	cout<<"Choose an Option: ";
+}
+
+void reportMenu(){
+    string option;
+    system("cls");
+
+    do{
+        reportMenuCout();
+        cin >> option;
+
+        if (option == "1")
+            cout<<"% Intakes per Sector."<<endl;
+        else if (option == "2")
+            cout<<"% Intakes per Electrical Devices."<<endl;
+        else if (option == "3")
+            cout<<"% Intakes of Energy Sources per month."<<endl;
+        else if (option == "4")
+            cout<<"Classification Localities in Energy Consumption."<<endl;
+        else if (option == "5")
+            cout<<"Classification Persons in Energy Consumption."<<endl;
+        else if (option == "6")
+            cout<<"Electrical Devices in descending order according to Home intake."<<endl;
+        else if (option == "7")
+            cout<<"Descending localities in total consumption."<<endl;
+        else if (option == "0")
+            system("cls");
+        else{
+            system("cls");
+            cout<<"Error: Invalid Entry! Try Again\n\n";
+        }
+    }while(option != "0");
+}
+
+void consultMenu(){
+    string option;
+    system("cls");
+
+    do{
+        consultMenuCout();
+        cin >> option;
+
+        if (option == "1")
+            cout<<"1. Consult the monthly consumption of the any device 'X' in a locality 'Y'."<<endl;
+        else if (option == "2")
+            cout<<"2. Consult most used Energy Source in a locality."<<endl;
+        else if (option == "3")
+            cout<<"3. Consult in a home, who is the most consumer person."<<endl;
+        else if (option == "0")
+            system("cls");
+        else{
+            system("cls");
+            cout<<"Error: Invalid Entry! Try Again\n\n";
+        }
+    }while(option != "0");
+}
+
+void insertMenu(){
+    string option;
+    system("cls");
+    do{
+        insertMenuCout();
+        cin >> option;
+
+        if (option == "1")
+            cout<<"Locality."<<endl;
+        else if (option == "2")
+            cout<<"Home."<<endl;
+        else if (option == "3")
+            cout<<"Person."<<endl;
+        else if (option == "4")
+            cout<<"Sector."<<endl;
+        else if (option == "5")
+            cout<<"Electrical Devices."<<endl;
+        else if (option == "6")
+            cout<<"6. Insert Energy."<<endl;
+        else if (option == "0")
+            system("cls");
+        else{
+            system("cls");
+            cout<<"Error: Invalid Entry, Try Again!\n\n";
+        }
+    }while(option != "0");
+}
+
+void mainMenu(){
+    string option;
+    system("cls");
+    do {
+        mainMenuCout();
+
+        cin>>option;
+
+        if(option == "1")
+                insertMenu();
+        else if (option == "2")
+            cout<<"2. Edit Electrical Devices."<<endl;
+        else if (option == "3")
+            cout<<"3. Delete Persons."<<endl;
+        else if (option == "4")
+            consultMenu();
+        else if (option == "5")
+            reportMenu();
+        else if (option == "0")
+            system("cls");
+        else{
+            system("cls");
+            cout<<"Error: Invalid Entry, Try Again!\n\n";
+        }
+    }while(option != "0");
+    cout<<"Thank You! Byeee!!!";
+    return;
+}
+
+int main(){
+    mainMenu();
     return 0;
 }
