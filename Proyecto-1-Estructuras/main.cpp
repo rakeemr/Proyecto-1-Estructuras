@@ -55,7 +55,7 @@ struct Persons{
         name = n;
         lastName = l;
         age = a;
-        intakeStandar = s;
+        //intakeStandar = s;
         next = NULL;
         bef = NULL;
     }
@@ -84,16 +84,26 @@ struct Sector {
 }*firstS;
 
 struct electricalDevices{
+<<<<<<< HEAD
     int id;
+=======
+>>>>>>> origin/master
     string name;
     double kilowatts;
     int intakeEnergyPerHour;
     struct electricalDevices *next;
+<<<<<<< HEAD
     electricalDevices(int i, string n,double k, int iEPH){
         id = i;
         name = n;
         kilowatts = k;
         intakeEnergyPerHour = iEPH;
+=======
+    electricalDevices(string n,double k, int i){
+        name = n;
+        kilowatts = k;
+        intakeEnergyPerHour = i;
+>>>>>>> origin/master
         next = NULL;
     }
 }*firstED;
@@ -198,7 +208,12 @@ void insertLocality(int id, string name, double energyIntake){
             temp = temp ->next;
             j++;
         }while(alphaOrder == false);
+<<<<<<< HEAD
         cout<<"Data Insert Correctly!\n";
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> origin/master
     }
 }
 
@@ -213,12 +228,18 @@ void insertSector(int id, string type, string name,int percent){
             temp = temp -> next;
         }
         temp -> next = nn;
+>>>>>>> origin/master
     }
     cout<<"Data Insert Correctly!\n";
 }
 
+<<<<<<< HEAD
 void insertElectricalDevices(int id, string name, double killowats, int intakeEnergyPerHour){
     struct electricalDevices * nn = new electricalDevices(id, name, killowats, intakeEnergyPerHour);
+=======
+void insertElectricalDevices(string name, double killowats, int intakeEnergyPerHour){
+    struct electricalDevices * nn = new electricalDevices(name, killowats, intakeEnergyPerHour);
+>>>>>>> origin/master
 
     if(firstED == NULL){ //Its the first
         firstED = nn;
@@ -273,6 +294,7 @@ void insertPerson(int id, string name, string lastName, int age, char intakeStan
             nn -> next = actually;
             nn -> bef = bef;
         }
+<<<<<<< HEAD
     }
     cout<<"Data Insert Correctly!\n";
 }
@@ -375,6 +397,10 @@ void localitySectorRelation(int idLocality, int idSector){
 
 
 ///------------------------------- Output Methods ------------------------///
+=======
+    }
+}
+>>>>>>> origin/master
 
 void printLocality(){
 	struct Locality * temp = firstL;
@@ -393,6 +419,7 @@ void printLocality(){
 
 void printElectricalDevices(){
 	struct electricalDevices * temp = firstED;
+<<<<<<< HEAD
 
 	if(temp==NULL)
 		cout<<"\nNo hay lista.....\n";
@@ -460,6 +487,107 @@ void loadData(){
     insertElectricalDevices(5,"Televisor",86.4,43);
     insertElectricalDevices(6,"Computador",36.9,67);
     cout<<"\n\n";
+=======
+
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+        do{
+			cout<< temp ->name <<", ";
+			cout<< temp ->kilowatts <<", ";
+			cout<< temp ->intakeEnergyPerHour <<", \n";
+
+			temp = temp->next;
+		}while(temp!=firstED);
+	}
+}
+
+void printEnergy(){
+	struct Energy * temp = firstE;
+
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+            	cout<< temp -> name <<", ";
+            	cout<< temp -> usagePercentage <<", \n";
+	    }
+	}
+}
+
+void printPersons(){
+	struct Persons * temp = firstP;
+
+	if(temp==NULL)
+		cout<<"\nNo hay lista.....\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+            	cout<< temp -> name <<", ";
+                cout<< temp -> lastName <<", ";
+            	cout<< temp -> age <<", ";
+            	cout<< temp -> intakeStandar <<" \n";
+	    }
+	}
+}
+
+int main()
+{
+    cout << "Contruction!!";
+    char c = 'A';
+
+    int x = c; // Look ma! No cast!
+
+    cout << "The character '" << c << "' has an ASCII code of " << x << endl;
+
+    insertLocality("Alajuela", 5.0);
+<<<<<<< HEAD
+    insertLocality("San Jose", 5.0);
+=======
+    insertLocality("San jose", 5.0);
+>>>>>>> origin/master
+    insertLocality("Cartago", 5.0);
+    insertLocality("Puntarenas", 5.0);
+    insertLocality("Limon", 5.0);
+    insertLocality("San Carlos", 5.0);
+    insertLocality("Palmera", 5.0);
+    insertLocality("Marina", 5.0);
+    insertLocality("Aguas Zarcas", 5.0);
+    insertLocality("Florencia", 5.0);
+    insertLocality("Fortuna", 5.0);
+
+<<<<<<< HEAD
+=======
+    /*
+    Aarón 	27
+Adrian 	100
+Adur 	26
+Agustín 	118
+Ahmed 	16
+Aimar 	137
+Aitor 	407
+Alain 	59
+Alberto 	236
+Alejandro 	127
+Alex 	42
+Alexander
+*/
+>>>>>>> origin/master
+    cout<<"\n\n";
+    printLocality();
+
+    //Pruebas en el main
+    insertElectricalDevices("Licuadora",34.9,45);
+    insertElectricalDevices("Lavadora",12.5,1245);
+    insertElectricalDevices("Refrigeradora",21.2,124);
+    insertElectricalDevices("Horno Microndas",57.1,34);
+    insertElectricalDevices("Televisor",86.4,43);
+    insertElectricalDevices("Computador",36.9,67);
+
+    cout<<"\n\n";
+    printElectricalDevices();
+
+>>>>>>> origin/master
     insertPerson(2098, "Hola", "Bsd", 14, 'A');
     insertPerson(2003, "Mundo", "Bsd", 15, 'B');
     insertPerson(2002, "soy", "Bsd", 16, 'C');
@@ -467,6 +595,7 @@ void loadData(){
     insertPerson(1999, "Yo", "Bsd", 18, 'E');
     insertPerson(2001, "Tu", "Bsd", 19, 'F');
     insertPerson(2045, "Aasd", "Bsd", 20, 'G');
+<<<<<<< HEAD
 }
 //-------------------------------------Aparience Methods--------------------------------
 void mainMenuCout(){
@@ -635,5 +764,10 @@ void mainMenu(){
 
 int main(){
     mainMenu();
+=======
+
+    cout<<"\n\n";
+    printPersons();
+>>>>>>> origin/master
     return 0;
 }
