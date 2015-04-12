@@ -520,6 +520,56 @@ void insertElectricalDevices(int idLocality, int searchCode, int idIntake, int i
 
 ///----------------------------- End of Insert Methods ----------------------------///
 
+///------------ Data modification methods of electrical devices -------------------///
+
+void editElectricalDevice(int idLocality, int searchCode, int idIntake, int id, string name, double killowats, int intakeEnergyPerHour){
+    if (localityDoesntExist(idLocality)||(homeDoesntExist(idLocality, searchCode)))
+        return ;
+
+    struct Intake * tempI = searchI(idLocality, searchCode, idIntake);
+    if (tempI == NULL){
+        cout<<"The Intake doesn't exist!\n";
+        return ;
+    }else{
+        struct electricalDevices * eDSearch = searchED(idLocality, searchCode, idIntake, id);
+        if (eDSearch != NULL){
+            eDSearch -> name = name;
+            eDSearch -> kilowatts = killowats;
+            eDSearch -> intakeEnergyPerHour = intakeEnergyPerHour;
+            cout<<"Modifications Completed!\n";
+            return;
+        }else
+            cout<<"The electrical device doesn't exist!\n";
+    }
+}
+
+///------------------------- End of Modification methods -------------------------///
+
+///------------------------------- Delete Methods --------------------------------///
+
+void deletePersons(int idPerson){
+    struct Persons * delPerson = searchP(idPerson);
+    struct Persons * delPersonBef = delPerson -> bef;
+    struct Persons * delPersonNext = delPerson -> next;
+
+
+	if (delPerson == NULL){
+		cout<<"The person does not exist, therefore can not be deleted!.\n";
+		return ;
+	}else if (delPersonBef == NULL){    // if it is the first
+        firstP = delPersonNext;
+        delPersonNext -> bef = NULL;
+	}else if ((delPersonBef != NULL)&&(delPersonNext != NULL)){     // if in the middle
+        delPersonBef -> next = delPersonNext;
+        delPersonNext -> bef = delPersonBef;
+	}else if (delPersonNext == NULL){       // if in the end
+        delPersonBef -> next = NULL;
+	}
+	delete delPerson;   // releases the memory
+}
+
+///------------------------------- End of Delete Methods ---------------- - ------///
+
 ///------------------------------- Relation Methods ------------------------------///
 
 void localitySectorRelation(int idLocality, int idSector){
@@ -770,6 +820,12 @@ void loadData(){
     printPersons();
     cout<<"\n\n";
 
+    deletePersons(2014162433);
+
+    cout<<"\n\n";
+    printPersons();
+    cout<<"\n\n";
+
     insertSector(1, "Industria", "Automotriz", 10);
     insertSector(2, "Transporte", "Aereo", 10);
     insertSector(3, "Transporte", "Maritimo", 10);
@@ -813,6 +869,11 @@ void loadData(){
     printElectricalDevice(5, 3, 4);
     cout<<"\n\n";
 
+    editElectricalDevice(5, 3, 1, 1, "Licuadora Gollo", 34.9, 50);
+
+    cout<<"\n\n";
+    printElectricalDevice(5, 3, 1);
+    cout<<"\n\n";
 
 }
 
