@@ -549,14 +549,15 @@ void editElectricalDevice(int idLocality, int searchCode, int idIntake, int id, 
 
 void deletePersons(int idPerson){
     struct Persons * delPerson = searchP(idPerson);
+    if (delPerson == NULL){
+		cout<<"The person does not exist, therefore can not be deleted!.\n";
+		return ;
+    }
+
     struct Persons * delPersonBef = delPerson -> bef;
     struct Persons * delPersonNext = delPerson -> next;
 
-
-	if (delPerson == NULL){
-		cout<<"The person does not exist, therefore can not be deleted!.\n";
-		return ;
-	}else if (delPersonBef == NULL){    // if it is the first
+    if (delPersonBef == NULL){    // if it is the first
         firstP = delPersonNext;
         delPersonNext -> bef = NULL;
 	}else if ((delPersonBef != NULL)&&(delPersonNext != NULL)){     // if in the middle
@@ -820,7 +821,7 @@ void loadData(){
     printPersons();
     cout<<"\n\n";
 
-    deletePersons(2014162433);
+    deletePersons(20141624373);
 
     cout<<"\n\n";
     printPersons();
