@@ -533,6 +533,70 @@ void localitySectorRelation(int idLocality, int idSector){
         cout<<"Sector doesn't found!";
         return;
     }
+
+    struct localitySector * nn = new localitySector();
+    nn -> linkS = sect;
+    nn -> next = local -> linkLS;
+    local -> linkLS = nn;
+}
+
+void homePersonRelation(int idLocality ,int codeHome, int idPerson){
+    struct Home * hom = searchH(idLocality ,codeHome);
+    struct Persons * person = searchP(idPerson);
+
+    if (hom == NULL){
+        cout<<"Home doesn't found!";
+        return;
+    }else if (person == NULL){
+        cout<<"Person doesn't found!";
+        return;
+    }
+
+    struct homePersons * nn = new homePersons();
+    nn -> linkP = person;
+    nn -> next = hom -> linkHP;
+    hom -> linkHP = nn;
+}
+
+void personIntakeRelation(int idPerson, int idLocality ,int codeHome, int idIntake){
+    struct Persons * person = searchP(idPerson);
+    struct Intake * intak = searchI(idLocality, codeHome, idIntake);
+
+    if (person == NULL){
+        cout<<"Person doesn't found!";
+        return;
+    }else if (intak == NULL){
+        cout<<"Intake doesn't found!";
+        return;
+    }
+
+    struct personsIntake * nn = new personsIntake();
+    nn -> linkI = intak;
+    nn -> next = person -> linkPI;
+    person -> linkPI = nn;
+}
+
+void intakeEnergySectorRelation(int idLocality ,int codeHome, int idIntake, int idEnergy, int idSector){
+    struct Intake * intak = searchI(idLocality, codeHome, idIntake);
+    struct Energy * ener = searchE(idEnergy);
+    struct Sector * sect = searchS(idSector);
+
+    if (intak == NULL){
+        cout<<"Intake doesn't found!";
+        return;
+    }else if (ener == NULL){
+        cout<<"Energy doesn't found!";
+        return;
+    }else if (sect == NULL){
+        cout<<"Sector doesn't found!";
+        return;
+    }
+
+    struct intakeEnergySector * nn = new intakeEnergySector();
+    nn -> linkE = ener;
+    nn -> linkS = sect;
+    nn -> next = intak -> linkIES;
+    intak -> linkIES = nn;
 }
 
 ///--------------------------- End Relation Methods ----------------------///
