@@ -146,6 +146,8 @@ struct intakeEnergySector{
     struct intakeEnergySector * next;
 };
 
+///-------------------------------- End of Structures ------------------------------///
+
 ///------------------------ Declaration of Apparence's Methods----------------------///
 
 void insertMenu();
@@ -157,7 +159,7 @@ void consultMenuCout();
 void mainMenuCout();
 void mainMenu();
 
-///-------------------------------- End of Structures ------------------------------///
+///------------------------------- End of Declaration -----------------------------///
 
 ///--------------------------------- Searches -------------------------------------///
 
@@ -219,10 +221,11 @@ struct  electricalDevices * searchED (int idLocality, int searchCode, int idInta
         struct electricalDevices * temp = tempI -> firstED;
 
         if (temp  != NULL){
-            for (;temp != NULL; temp = temp -> next){
+            do{
                 if(temp -> id == idElectricalDevice)
                     return temp;
-            }
+                temp = temp -> next;
+            }while(temp != tempI -> firstED);
         }
     }
     return NULL;
@@ -266,7 +269,30 @@ struct  Energy * searchE (int id){
 
 ///------------------------------- End of Searches ---------------------------------///
 
+///---------------- Methods to shorten a few lines of repeated code ---------------///
+
+bool localityDoesntExist(int localityToRoam){
+    struct Locality * localNode = searchL(localityToRoam);
+    if (localNode == NULL){
+        cout<<"\nThe Locality doesn't exist...\n";
+        return true;
+    }
+    return false;
+}
+
+bool homeDoesntExist(int localityToRoam, int codeToRoam){
+    struct Home * homNode = searchH(localityToRoam, codeToRoam);
+    if (homNode == NULL){
+        cout<<"\nThe Home doesn't exist...\n";
+        return true;
+    }
+    return false;
+}
+
+///-------------------------- End of shortening methods -----------------------------///
+
 ///-------------------------------- Insert Methods ---------------------------------///
+
 bool isAlphabeticallyGreaterThan(struct Locality * nn, struct Locality * temp, int i){
     int x = nn -> name[i];
     int y = temp -> name[i];
@@ -427,35 +453,28 @@ void insertEnergy(int id, string name, int usagePercentage){
     cout<<"Data Insert Correctly!\n";
 }
 
-void insertElectricalDevices(int idLocality, int searchCode, int idIntake, int id, string name, double killowats, int intakeEnergyPerHour){
-    struct electricalDevices * nn = new electricalDevices(id, name, killowats, intakeEnergyPerHour);
+void insertIntake(int idLocality, int searchCode, int id, string month, int intakeEnergy){
+    struct Intake * nn = new Intake(id, month, intakeEnergy);
 
-    struct Locality * tempL = searchL(idLocality);
-    if (tempL == NULL){
-        cout<<"The Locality doesn't exist!\n";
+    if (localityDoesntExist(idLocality))
         return ;
-    }
+
     struct Home * tempH = searchH(idLocality, searchCode);
     if (tempH == NULL){
         cout<<"The Home doesn't exist!\n";
         return ;
-    }
-    struct Intake * tempI = searchI(idLocality, searchCode, idIntake);
-    if (tempI == NULL){
-        cout<<"The Intake doesn't exist!\n";
-        return ;
     }else{
-        struct electricalDevices * eDSearch = searchED(idLocality, searchCode, idIntake, nn -> id);
+        struct Intake * intakeSearch = searchI(idLocality, searchCode, nn -> id);
 
-        if (eDSearch != NULL){
-            cout<<"This electrical device already exists!\n";
+        if (intakeSearch != NULL){
+            cout<<"This Intake already exists!\n";
             return;
         }
 
-        if (tempI -> firstED == NULL)
-            tempI -> firstED = nn;
+        if (tempH -> firstI == NULL)
+            tempH -> firstI = nn;
         else{
-            struct Home * temp = tempI -> firstED;
+            struct Intake * temp = tempH -> firstI;
 
             while(temp -> next != NULL){
                 temp = temp -> next;
@@ -466,9 +485,42 @@ void insertElectricalDevices(int idLocality, int searchCode, int idIntake, int i
     }
 }
 
+void insertElectricalDevices(int idLocality, int searchCode, int idIntake, int id, string name, double killowats, int intakeEnergyPerHour){
+    struct electricalDevices * nn = new electricalDevices(id, name, killowats, intakeEnergyPerHour);
 
+    if (localityDoesntExist(idLocality)||(homeDoesntExist(idLocality, searchCode)))
+        return ;
 
-///------------------------------- Relation Methods ------------------------///
+    struct Intake * tempI = searchI(idLocality, searchCode, idIntake);
+    if (tempI == NULL){
+        cout<<"The Intake doesn't exist!\n";
+        return ;
+    }else{
+        struct electricalDevices * eDSearch = searchED(idLocality, searchCode, idIntake, nn -> id);
+        if (eDSearch != NULL){
+            cout<<"This electrical device already exists!\n";
+            return;
+        }
+
+        if (tempI -> firstED == NULL){
+            tempI -> firstED = nn;
+            nn -> next = nn;
+        }else{
+            nn -> next = tempI -> firstED;
+            struct electricalDevices * temp = tempI -> firstED;
+            do{
+                temp = temp -> next;
+            }while(temp -> next != tempI -> firstED);
+
+            temp -> next = nn;
+        }
+        cout<<"Data Insert Correctly!\n";
+    }
+}
+
+///----------------------------- End of Insert Methods ----------------------------///
+
+///------------------------------- Relation Methods ------------------------------///
 
 void localitySectorRelation(int idLocality, int idSector){
     struct Locality * local = searchL(idLocality);
@@ -482,6 +534,8 @@ void localitySectorRelation(int idLocality, int idSector){
         return;
     }
 }
+
+///--------------------------- End Relation Methods ----------------------///
 
 ///------------------------------- Output Methods ------------------------///
 
@@ -502,6 +556,11 @@ void printLocality(){
 
 void printHomes(int localityToRoam){
     struct Locality * localNode = searchL(localityToRoam);
+    if (localNode == NULL){
+        cout<<"\nThe Locality doesn't exist...\n";
+        return ;
+    }
+
 	struct Home * temp = localNode -> firstH;
 
 	if(temp == NULL)
@@ -511,6 +570,52 @@ void printHomes(int localityToRoam){
                 cout<< temp -> code <<", ";
             	cout<< temp -> address <<". \n";
 	    }
+	}
+}
+
+void printIntake(int localityToRoam, int codeToRoam){
+    if (localityDoesntExist(localityToRoam))
+        return;
+
+    struct Home * homNode = searchH(localityToRoam, codeToRoam);
+    if (homNode == NULL){
+        cout<<"\nThe Home doesn't exist...\n";
+        return ;
+    }
+
+	struct Intake * temp = homNode -> firstI;
+	if(temp == NULL)
+		cout<<"\nThe list doesn't exist...\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+                cout<< temp -> month <<", ";
+            	cout<< temp -> intakeEnergy <<". \n";
+	    }
+	}
+}
+
+void printElectricalDevice(int localityToRoam, int codeToRoam, int intakeToRoam){
+    if (localityDoesntExist(localityToRoam)||(homeDoesntExist(localityToRoam, codeToRoam)))
+        return;
+
+    struct Intake * intakeNode = searchI(localityToRoam, codeToRoam, intakeToRoam);
+    if (intakeNode == NULL){
+        cout<<"\nThe Intake doesn't exist...\n";
+        return ;
+    }
+
+	struct electricalDevices * temp = intakeNode -> firstED;
+	if(temp == NULL)
+		cout<<"\nThe list doesn't exist...\n";
+	else{
+		do{
+            cout<< temp -> id <<", ";
+            cout<< temp -> name <<", ";
+            cout<< temp -> kilowatts <<", ";
+            cout<< temp -> intakeEnergyPerHour <<". \n";
+			temp = temp->next;
+		}while(temp != intakeNode -> firstED);
 	}
 }
 
@@ -559,26 +664,6 @@ void printEnergy(){
 	}
 }
 
-/*
-void printElectricalDevices(){
-	struct electricalDevices * temp = firstED;
-
-	if(temp==NULL)
-		cout<<"\nNo hay lista.....\n";
-	else{
-        do{
-            cout<< temp -> id <<", ";
-			cout<< temp ->name <<", ";
-			cout<< temp ->kilowatts <<", ";
-			cout<< temp ->intakeEnergyPerHour <<", \n";
-
-			temp = temp->next;
-		}while(temp!=firstED);
-	}
-}
-*/
-
-
 void loadData(){
     insertLocality(1,"San Jose", 5.0);
     insertLocality(2,"Alajuela", 5.0);
@@ -607,6 +692,7 @@ void loadData(){
 
     cout<<"\n\n";
     printHomes(5);
+    printHomes(14);
     cout<<"\n\n";
 
     insertPerson(2014160007, "Andres", "Garcia", 20, 'A');
@@ -632,17 +718,43 @@ void loadData(){
     printSector();
     cout<<"\n\n";
 
-    //Pruebas en el main
-    //insertElectricalDevices(1,"Licuadora",34.9,45);
-    //insertElectricalDevices(2,"Lavadora",12.5,1245);
-    //insertElectricalDevices(3,"Refrigeradora",21.2,124);
-    //insertElectricalDevices(4,"Horno Microndas",57.1,34);
-    //insertElectricalDevices(5,"Televisor",86.4,43);
-    //insertElectricalDevices(6,"Computador",36.9,67);
+    insertIntake(5, 3, 1, "Enero", 80);
+    insertIntake(5, 3, 2, "Febrero", 90);
+    insertIntake(5, 3, 3, "Marzo", 69);
+    insertIntake(5, 3, 1, "Agosto", 60); // equal
+    insertIntake(14, 3, 1, "Enero", 80);
+    insertIntake(1, 3, 1, "Enero", 60);
+    insertIntake(1, 1, 1, "Enero", 80);
+
     cout<<"\n\n";
+    printIntake(5, 3);
+    printIntake(13, 3);
+    printIntake(1, 3);
+    printIntake(1, 1);
+    cout<<"\n\n";
+
+    //void insertElectricalDevices(int idLocality, int searchCode, int idIntake, int id, string name, double killowats, int intakeEnergyPerHour){
+
+    insertElectricalDevices(5, 3, 1, 1, "Licuadora", 34.9, 45);
+    insertElectricalDevices(5, 3, 1, 2, "Lavadora", 12.5, 1245);
+    insertElectricalDevices(14, 3, 1, 3, "Refrigeradora", 21.2, 124);
+    insertElectricalDevices(5, 2, 1, 4, "Horno Microndas", 57.1, 34);
+    insertElectricalDevices(5, 3, 4, 5, "Televisor", 86.4, 43);
+    insertElectricalDevices(5, 3, 1, 6, "Computador", 36.9, 67);
+
+    cout<<"\n\n";
+    printElectricalDevice(5, 3, 1);
+    printElectricalDevice(14, 3, 1);
+    printElectricalDevice(5, 2, 1);
+    printElectricalDevice(5, 3, 4);
+    cout<<"\n\n";
+
+
 }
 
-//-------------------------------------Aparience Methods--------------------------------///
+///-------------------------------- End Output Methods -----------------------------------///
+
+///--------------------------------- Aparience Methods -----------------------------------///
 
 void mainMenuCout(){
     cout<<"\t\t Main Menu\n"<<endl;
@@ -807,6 +919,8 @@ void mainMenu(){
     cout<<"Thank You! Byeee!!!";
     return;
 }
+
+///------------------------------ End of Aparience Methods -------------------------------///
 
 int main(){
     loadData();
