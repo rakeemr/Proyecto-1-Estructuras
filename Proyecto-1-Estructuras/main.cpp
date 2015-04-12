@@ -26,6 +26,7 @@ struct Locality{
         name = n;
         energyIntake = eI;
         next = NULL;
+        firstH = NULL;
     }
 }*firstL;
 
@@ -39,6 +40,7 @@ struct Home{
         code = c;
         address = ad;
         next = NULL;
+        firstI = NULL;
     }
 };
 
@@ -74,6 +76,7 @@ struct Intake{
         month = m;
         intakeEnergy = iE;
         next = NULL;
+        firstED = NULL;
     }
 };
 
@@ -167,20 +170,60 @@ struct Locality * searchL (int id){
         if(temp -> id == id)
             return temp;
         temp = temp -> next;
-        cout<<"Hola Mundo desde l\n";
     }while(temp != firstL);
     return NULL;
 };
 
 struct  Home * searchH (int idLocality, int searchCode){
     struct Locality * tempL = searchL(idLocality);
-    struct Home * temp = tempL -> firstH;
 
-    if((tempL  == NULL)||(temp  == NULL))
+    if (tempL  == NULL)
         return NULL;
-    for (;temp != NULL; temp = temp -> next){
-        if(temp -> code == searchCode)
-            return temp;
+    else{
+        struct Home * temp = tempL -> firstH;
+
+        if (temp  != NULL){
+            for (;temp != NULL; temp = temp -> next){
+                if(temp -> code == searchCode)
+                    return temp;
+            }
+        }
+    }
+    return NULL;
+};
+
+struct  Intake * searchI (int idLocality, int searchCode, int idIntake){
+    struct Home * tempH = searchH(idLocality, searchCode);
+
+    if (tempH  == NULL)
+        return NULL;
+    else{
+        struct Intake * temp = tempH -> firstI;
+
+        if (temp  != NULL){
+            for (;temp != NULL; temp = temp -> next){
+                if(temp -> id == idIntake)
+                    return temp;
+            }
+        }
+    }
+    return NULL;
+};
+
+struct  electricalDevices * searchED (int idLocality, int searchCode, int idIntake, int idElectricalDevice){
+    struct Intake * tempI = searchI(idLocality, searchCode, idIntake);
+
+    if (tempI  == NULL)
+        return NULL;
+    else{
+        struct electricalDevices * temp = tempI -> firstED;
+
+        if (temp  != NULL){
+            for (;temp != NULL; temp = temp -> next){
+                if(temp -> id == idElectricalDevice)
+                    return temp;
+            }
+        }
     }
     return NULL;
 };
@@ -221,20 +264,6 @@ struct  Energy * searchE (int id){
     return NULL;
 };
 
-/*
-struct  electricalDevices * searchED (int id){
-    struct electricalDevices * temp = firstED;
-
-    if(firstED == NULL)
-        return NULL;
-    for (;temp != NULL; temp = temp -> next){
-        if(temp -> id == id)
-            return temp;
-    }
-    return NULL;
-};
-*/
-
 ///------------------------------- End of Searches ---------------------------------///
 
 ///-------------------------------- Insert Methods ---------------------------------///
@@ -253,6 +282,12 @@ bool isAlphabeticallyGreaterThan(struct Locality * nn, struct Locality * temp, i
 
 void insertLocality(int id, string name, double energyIntake){
     struct Locality * nn = new Locality(id, name, energyIntake);
+    struct Locality * localSearch = searchL(nn -> id);
+
+    if (localSearch != NULL){
+        cout<<"This locality already exists!\n";
+        return;
+    }
 
     if(firstL == NULL){ //Its the first
         firstL = nn;
@@ -287,80 +322,43 @@ void insertLocality(int id, string name, double energyIntake){
     cout<<"Data Insert Correctly!\n";
 }
 
-void insertSector(int id, string type, string name,int percent){
-    struct Sector * nn = new Sector(id, type, name, percent);
-
-    if(firstS == NULL)
-        firstS = nn;
-    else{
-        struct Sector * temp = firstS;
-        while(temp -> next != NULL){
-            temp = temp -> next;
-        }
-        temp -> next = nn;
-    }
-    cout<<"Data Insert Correctly!\n";
-}
-
 void insertHome(int idLocality ,int code, string address){
     struct Home * nn = new Home(code, address);
     struct Locality * tempL = searchL(idLocality);
-    struct Home * tempFirstH = tempL -> firstH;
-    cout<<"Hola Mundo\n";
 
     if (tempL == NULL){
         cout<<"The Locality doesn't exist!\n";
         return ;
-    }else if (tempFirstH == NULL)
-        tempFirstH = nn;
-    else{
-        struct Home * temp = tempFirstH;
-        while(temp -> next != NULL){
-            temp = temp -> next;
-        }
-        temp -> next = nn;
-    }
-    cout<<"Data Insert Correctly!\n";
-}
-
-// insertar sin servir no existe firstED, debido a correcion de codigo
-/*
-void insertElectricalDevices(int id, string name, double killowats, int intakeEnergyPerHour){
-    struct electricalDevices * nn = new electricalDevices(id, name, killowats, intakeEnergyPerHour);
-
-    if(firstED == NULL){ //Its the first
-        firstED = nn;
-        nn -> next = nn;
     }else{
-        struct electricalDevices * temp = firstED;
-        nn -> next = firstED;
-        do{
-            temp = temp -> next;
-        }while(temp -> next != firstED);
-        temp -> next = nn;
-        firstED = nn;
-    }
-    cout<<"Data Insert Correctly!\n";
-}
-*/
+        struct Home * homSearch = searchH(idLocality, nn -> code);
 
-void insertEnergy(int id, string name, int usagePercentage){
-    struct Energy * nn = new Energy(id, name, usagePercentage);
-
-    if(firstE == NULL)
-        firstE = nn;
-    else{
-        struct Energy * temp = firstE;
-        while(temp -> next != NULL){
-            temp = temp -> next;
+        if (homSearch != NULL){
+            cout<<"This home already exists!\n";
+            return;
         }
-        temp -> next = nn;
+
+        if (tempL -> firstH == NULL)
+            tempL -> firstH = nn;
+        else{
+            struct Home * temp = tempL -> firstH;
+
+            while(temp -> next != NULL){
+                temp = temp -> next;
+            }
+            temp -> next = nn;
+        }
+        cout<<"Data Insert Correctly!\n";
     }
-    cout<<"Data Insert Correctly!\n";
 }
 
 void insertPerson(int id, string name, string lastName, int age, char intakeStandar){
     struct Persons * nn = new Persons(id, name, lastName, age, intakeStandar);
+    struct Persons * persoSearch = searchP(nn -> id);
+
+    if (persoSearch != NULL){
+        cout<<"This person already exists!\n";
+        return;
+    }
 
     if(firstP == NULL)
         firstP = nn;
@@ -387,6 +385,89 @@ void insertPerson(int id, string name, string lastName, int age, char intakeStan
     cout<<"Data Insert Correctly!\n";
 }
 
+void insertSector(int id, string type, string name,int percent){
+    struct Sector * nn = new Sector(id, type, name, percent);
+    struct Sector * secSearch = searchS(nn -> id);
+
+    if (secSearch != NULL){
+        cout<<"This sector already exists!\n";
+        return;
+    }
+
+    if(firstS == NULL)
+        firstS = nn;
+    else{
+        struct Sector * temp = firstS;
+        while(temp -> next != NULL){
+            temp = temp -> next;
+        }
+        temp -> next = nn;
+    }
+    cout<<"Data Insert Correctly!\n";
+}
+
+void insertEnergy(int id, string name, int usagePercentage){
+    struct Energy * nn = new Energy(id, name, usagePercentage);
+    struct Energy * eneSearch = searchE(nn -> id);
+
+    if (eneSearch != NULL){
+        cout<<"This energy source already exists!\n";
+        return;
+    }
+
+    if(firstE == NULL)
+        firstE = nn;
+    else{
+        struct Energy * temp = firstE;
+        while(temp -> next != NULL){
+            temp = temp -> next;
+        }
+        temp -> next = nn;
+    }
+    cout<<"Data Insert Correctly!\n";
+}
+
+void insertElectricalDevices(int idLocality, int searchCode, int idIntake, int id, string name, double killowats, int intakeEnergyPerHour){
+    struct electricalDevices * nn = new electricalDevices(id, name, killowats, intakeEnergyPerHour);
+
+    struct Locality * tempL = searchL(idLocality);
+    if (tempL == NULL){
+        cout<<"The Locality doesn't exist!\n";
+        return ;
+    }
+    struct Home * tempH = searchH(idLocality, searchCode);
+    if (tempH == NULL){
+        cout<<"The Home doesn't exist!\n";
+        return ;
+    }
+    struct Intake * tempI = searchI(idLocality, searchCode, idIntake);
+    if (tempI == NULL){
+        cout<<"The Intake doesn't exist!\n";
+        return ;
+    }else{
+        struct electricalDevices * eDSearch = searchED(idLocality, searchCode, idIntake, nn -> id);
+
+        if (eDSearch != NULL){
+            cout<<"This electrical device already exists!\n";
+            return;
+        }
+
+        if (tempI -> firstED == NULL)
+            tempI -> firstED = nn;
+        else{
+            struct Home * temp = tempI -> firstED;
+
+            while(temp -> next != NULL){
+                temp = temp -> next;
+            }
+            temp -> next = nn;
+        }
+        cout<<"Data Insert Correctly!\n";
+    }
+}
+
+
+
 ///------------------------------- Relation Methods ------------------------///
 
 void localitySectorRelation(int idLocality, int idSector){
@@ -408,14 +489,73 @@ void printLocality(){
 	struct Locality * temp = firstL;
 
 	if(temp==NULL)
-		cout<<"\nNo hay lista.....\n";
+		cout<<"\nThe list doesn't exist...\n";
 	else{
 
 		do{
             cout<< temp -> id <<", ";
-			cout<< temp ->name <<", \n";
+			cout<< temp ->name <<". \n";
 			temp = temp->next;
 		}while(temp!=firstL);
+	}
+}
+
+void printHomes(int localityToRoam){
+    struct Locality * localNode = searchL(localityToRoam);
+	struct Home * temp = localNode -> firstH;
+
+	if(temp == NULL)
+		cout<<"\nThe list doesn't exist...\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> code <<", ";
+            	cout<< temp -> address <<". \n";
+	    }
+	}
+}
+
+void printPersons(){
+	struct Persons * temp = firstP;
+
+	if(temp==NULL)
+		cout<<"\nThe list doesn't exist...\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+            	cout<< temp -> name <<", ";
+                cout<< temp -> lastName <<", ";
+            	cout<< temp -> age <<", ";
+            	cout<< temp -> intakeStandar <<". \n";
+	    }
+	}
+}
+
+void printSector(){
+	struct Sector * temp = firstS;
+
+	if(temp==NULL)
+		cout<<"\nThe list doesn't exist...\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+                cout<< temp -> type <<", ";
+            	cout<< temp -> name <<", ";
+            	cout<< temp -> percent <<". \n";
+	    }
+	}
+}
+
+void printEnergy(){
+	struct Energy * temp = firstE;
+
+	if(temp==NULL)
+		cout<<"\nThe list doesn't exist...\n";
+	else{
+	    for(;temp != NULL; temp = temp->next){
+                cout<< temp -> id <<", ";
+            	cout<< temp -> name <<", ";
+            	cout<< temp -> usagePercentage <<". \n";
+	    }
 	}
 }
 
@@ -438,35 +578,6 @@ void printElectricalDevices(){
 }
 */
 
-void printEnergy(){
-	struct Energy * temp = firstE;
-
-	if(temp==NULL)
-		cout<<"\nNo hay lista.....\n";
-	else{
-	    for(;temp != NULL; temp = temp->next){
-                cout<< temp -> id <<", ";
-            	cout<< temp -> name <<", ";
-            	cout<< temp -> usagePercentage <<", \n";
-	    }
-	}
-}
-
-void printPersons(){
-	struct Persons * temp = firstP;
-
-	if(temp==NULL)
-		cout<<"\nNo hay lista.....\n";
-	else{
-	    for(;temp != NULL; temp = temp->next){
-                cout<< temp -> id <<", ";
-            	cout<< temp -> name <<", ";
-                cout<< temp -> lastName <<", ";
-            	cout<< temp -> age <<", ";
-            	cout<< temp -> intakeStandar <<" \n";
-	    }
-	}
-}
 
 void loadData(){
     insertLocality(1,"San Jose", 5.0);
@@ -478,19 +589,47 @@ void loadData(){
     insertLocality(7,"San Carlos", 5.0);
     insertLocality(8,"Palmera", 5.0);
     insertLocality(9,"Marina", 5.0);
+    insertLocality(7,"asda La pancha", 5.0);
     insertLocality(10,"Aguas Zarcas", 5.0);
-    //insertLocality(11,"Florencia", 5.0);
-    //insertLocality(12,"Fortuna", 5.0);
+
     cout<<"\n\n";
     printLocality();
+    cout<<"\n\n";
 
-    insertHome(3, 1, "Casa Random.");
-    insertHome(5, 2, "Casa Random.");
+
+    insertHome(1, 1, "Casa Random.");
+    insertHome(5, 1, "Casa Random.");
     insertHome(5, 3, "Casa Random.");
-    insertHome(7, 1, "Casa Random.");
+    insertHome(5, 1, "Casa Random.");
     insertHome(8, 1, "Casa Random.");
     insertHome(7, 2, "Casa Random.");
     insertHome(14, 1, "Casa Random.");
+
+    cout<<"\n\n";
+    printHomes(5);
+    cout<<"\n\n";
+
+    insertPerson(2014160007, "Andres", "Garcia", 20, 'A');
+    insertPerson(2014160519, "Raquel", "Mora", 20, 'A');
+    insertPerson(2014162433, "Yerlin", "Avila", 20, 'A');
+    insertPerson(2013123407, "Leiver", "Rodriguez", 20, 'A');
+    insertPerson(2012332313, "Mainor", "Gamboa", 20, 'A');
+    insertPerson(2014160007, "Peluca", "Salas", 28, 'A');
+
+    cout<<"\n\n";
+    printPersons();
+    cout<<"\n\n";
+
+    insertSector(1, "Industria", "Automotriz", 10);
+    insertSector(2, "Transporte", "Aereo", 10);
+    insertSector(3, "Transporte", "Maritimo", 10);
+    insertSector(4, "Industria", "Textil", 10);
+    insertSector(5, "Servicios", "Comercio", 10);
+    insertSector(6, "Servicios", "Hoteles", 10);
+    insertSector(1, "Industria", "Automotriz", 10);
+
+    cout<<"\n\n";
+    printSector();
     cout<<"\n\n";
 
     //Pruebas en el main
@@ -503,7 +642,8 @@ void loadData(){
     cout<<"\n\n";
 }
 
-//-------------------------------------Aparience Methods--------------------------------
+//-------------------------------------Aparience Methods--------------------------------///
+
 void mainMenuCout(){
     cout<<"\t\t Main Menu\n"<<endl;
 	cout<<"-------------------------------------------"<<endl;
