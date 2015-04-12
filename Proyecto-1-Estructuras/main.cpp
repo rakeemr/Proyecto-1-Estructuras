@@ -799,8 +799,9 @@ void loadData(){
 
     insertHome(1, 1, "Casa Random.");
     insertHome(5, 1, "Casa Random.");
+    insertHome(5, 2, "Casa Random.");
     insertHome(5, 3, "Casa Random.");
-    insertHome(5, 1, "Casa Random.");
+    insertHome(5, 4, "Casa Random.");
     insertHome(8, 1, "Casa Random.");
     insertHome(7, 2, "Casa Random.");
     insertHome(14, 1, "Casa Random.");
@@ -839,16 +840,26 @@ void loadData(){
     printSector();
     cout<<"\n\n";
 
-    insertIntake(5, 3, 1, "Enero", 80);
-    insertIntake(5, 3, 2, "Febrero", 90);
-    insertIntake(5, 3, 3, "Marzo", 69);
-    insertIntake(5, 3, 1, "Agosto", 60); // equal
+    insertIntake(5, 1, 1, "Enero", 80);
+    insertIntake(5, 1, 2, "Febrero", 90);
+    insertIntake(5, 2, 1, "Marzo", 69);
+    insertIntake(5, 2, 2, "Agosto", 60); // equal
+    insertIntake(5, 3, 1, "Marzo", 69);
+    insertIntake(5, 3, 2, "Agosto", 60); // equal
+    insertIntake(5, 4, 1, "Marzo", 69);
+    insertIntake(5, 4, 2, "Agosto", 60); // equal
+    insertIntake(5, 1, 3, "Marzo", 69);
+    insertIntake(5, 1, 1, "Agosto", 60); // equal
+
     insertIntake(14, 3, 1, "Enero", 80);
     insertIntake(1, 3, 1, "Enero", 60);
     insertIntake(1, 1, 1, "Enero", 80);
 
     cout<<"\n\n";
+    printIntake(5, 1);
+    printIntake(5, 2);
     printIntake(5, 3);
+    printIntake(5, 4);
     printIntake(13, 3);
     printIntake(1, 3);
     printIntake(1, 1);
@@ -856,29 +867,109 @@ void loadData(){
 
     //void insertElectricalDevices(int idLocality, int searchCode, int idIntake, int id, string name, double killowats, int intakeEnergyPerHour){
 
-    insertElectricalDevices(5, 3, 1, 1, "Licuadora", 34.9, 45);
-    insertElectricalDevices(5, 3, 1, 2, "Lavadora", 12.5, 1245);
+    insertElectricalDevices(5, 1, 1, 1, "Licuadora", 34.9, 25);
+    insertElectricalDevices(5, 1, 2, 1, "Licuadora", 34.9, 5);
+    insertElectricalDevices(5, 2, 1, 1, "Licuadora", 34.9, 50);
+    insertElectricalDevices(5, 2, 2, 1, "Licuadora", 34.9, 20);
+    insertElectricalDevices(5, 3, 1, 1, "Licuadora", 34.9, 50);
+    insertElectricalDevices(5, 3, 2, 1, "Licuadora", 34.9, 20);
+
+    insertElectricalDevices(5, 4, 1, 2, "Lavadora", 12.5, 1245);
     insertElectricalDevices(14, 3, 1, 3, "Refrigeradora", 21.2, 124);
     insertElectricalDevices(5, 2, 1, 4, "Horno Microndas", 57.1, 34);
-    insertElectricalDevices(5, 3, 4, 5, "Televisor", 86.4, 43);
+    insertElectricalDevices(5, 4, 4, 5, "Televisor", 86.4, 43);
     insertElectricalDevices(5, 3, 1, 6, "Computador", 36.9, 67);
 
     cout<<"\n\n";
+    printElectricalDevice(5, 1, 1);
+    printElectricalDevice(5, 2, 1);
     printElectricalDevice(5, 3, 1);
     printElectricalDevice(14, 3, 1);
     printElectricalDevice(5, 2, 1);
     printElectricalDevice(5, 3, 4);
     cout<<"\n\n";
 
-    editElectricalDevice(5, 3, 1, 1, "Licuadora Gollo", 34.9, 50);
+    //editElectricalDevice(5, 3, 1, 1, "Licuadora Gollo", 34.9, 50);
 
     cout<<"\n\n";
-    printElectricalDevice(5, 3, 1);
+    //printElectricalDevice(5, 3, 1);
     cout<<"\n\n";
 
 }
 
 ///-------------------------------- End Output Methods -----------------------------------///
+
+///--------------------------------- Consult Methods -------------------------------------///
+
+int recursiveTraversal(int idLocality, struct Home *homeToRoam, struct Intake *intakeToRoam, int idElectricalDevice){
+    if (homeToRoam == NULL)
+        return 0;
+    else{
+        intakeToRoam = homeToRoam -> firstI;
+        cout<<"\t"<<homeToRoam -> code <<", "<<intakeToRoam -> month<<"\n";
+
+        if (intakeToRoam == NULL)
+            return 0 + (recursiveTraversal(idLocality, homeToRoam -> next, intakeToRoam, idElectricalDevice));
+        else{
+            //struct electricalDevices * temp = intakeToRoam -> firstED;
+            cout<<idLocality <<", "<<homeToRoam -> code <<", "<<intakeToRoam -> id<<", "<<idElectricalDevice<<"\t ";
+            struct electricalDevices * temp = searchED(idLocality, homeToRoam -> code, intakeToRoam -> id, idElectricalDevice);
+
+            if (temp == NULL){
+                cout<<"\nEntro aqui..\n";
+                return 0 + (recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice));
+            }else{
+                cout<<"\t" << intakeToRoam <<", "<< intakeToRoam -> next  ;
+                return (temp -> intakeEnergyPerHour) + (recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice));
+            }
+        }
+    }
+}
+/*
+void recursiveTraversal(int idLocality, struct Home * homeToRoam, struct Intake * intakeToRoam, int idElectricalDevice){
+    cout<<homeToRoam -> code << "\n";
+    if (homeToRoam == NULL)
+        return ;
+
+    recursiveTraversal(idLocality, homeToRoam -> next, intakeToRoam, idElectricalDevice);
+    cout<<"Entro aqui..\n";
+    intakeToRoam = homeToRoam -> firstI;
+    if (intakeToRoam == NULL)
+        return ;
+
+    recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice);
+
+    cout<<idLocality <<", "<<homeToRoam -> code <<", "<<intakeToRoam -> id<<", "<<idElectricalDevice<<"\t ";
+    struct electricalDevices * temp = searchED(idLocality, homeToRoam -> code, intakeToRoam -> id, idElectricalDevice);
+
+    if (temp == NULL){
+        return ;
+    }else{
+        cout<<temp -> intakeEnergyPerHour << "\n";
+        return;
+    }
+}
+*/
+
+void monthlyConsumptionOfADeviceInALocality(int idLocality, int idElectricalDevice){
+    struct Locality * localityX = searchL(idLocality);
+    int monthlyConsumption;
+
+    if (localityX == NULL){
+        cout<<"\nThe Locality doesn't exist...\n";
+        return ;
+    }else{
+        monthlyConsumption = recursiveTraversal(idLocality , localityX -> firstH, NULL, idElectricalDevice);
+        cout<<"monthlyConsumption: "<<monthlyConsumption;
+    }
+
+
+
+}
+
+
+
+///-------------------------------- End Consult Methods ----------------------------------///
 
 ///--------------------------------- Aparience Methods -----------------------------------///
 
@@ -1050,6 +1141,7 @@ void mainMenu(){
 
 int main(){
     loadData();
+    monthlyConsumptionOfADeviceInALocality(5, 1);
     //mainMenu();
     return 0;
 }
