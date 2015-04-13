@@ -873,6 +873,7 @@ void loadData(){
     insertElectricalDevices(5, 2, 2, 1, "Licuadora", 34.9, 20);
     insertElectricalDevices(5, 3, 1, 1, "Licuadora", 34.9, 50);
     insertElectricalDevices(5, 3, 2, 1, "Licuadora", 34.9, 20);
+    insertElectricalDevices(5, 1, 3, 1, "Licuadora", 34.9, 20);
 
     insertElectricalDevices(5, 4, 1, 2, "Lavadora", 12.5, 1245);
     insertElectricalDevices(14, 3, 1, 3, "Refrigeradora", 21.2, 124);
@@ -905,51 +906,22 @@ int recursiveTraversal(int idLocality, struct Home *homeToRoam, struct Intake *i
     if (homeToRoam == NULL)
         return 0;
     else{
-        intakeToRoam = homeToRoam -> firstI;
-        cout<<"\t"<<homeToRoam -> code <<", "<<intakeToRoam -> month<<"\n";
-
         if (intakeToRoam == NULL)
-            return 0 + (recursiveTraversal(idLocality, homeToRoam -> next, intakeToRoam, idElectricalDevice));
+            return 0 + (recursiveTraversal(idLocality, homeToRoam , homeToRoam -> firstI, idElectricalDevice));
         else{
-            //struct electricalDevices * temp = intakeToRoam -> firstED;
-            cout<<idLocality <<", "<<homeToRoam -> code <<", "<<intakeToRoam -> id<<", "<<idElectricalDevice<<"\t ";
             struct electricalDevices * temp = searchED(idLocality, homeToRoam -> code, intakeToRoam -> id, idElectricalDevice);
+            int consumption = 0;
 
-            if (temp == NULL){
-                cout<<"\nEntro aqui..\n";
-                return 0 + (recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice));
-            }else{
-                cout<<"\t" << intakeToRoam <<", "<< intakeToRoam -> next  ;
-                return (temp -> intakeEnergyPerHour) + (recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice));
-            }
+            if (temp != NULL)
+                consumption = temp -> intakeEnergyPerHour;
+
+            if  (intakeToRoam -> next != NULL)
+                return consumption + (recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice));
+            else
+                return consumption + (recursiveTraversal(idLocality, homeToRoam -> next, intakeToRoam, idElectricalDevice));
         }
     }
 }
-/*
-void recursiveTraversal(int idLocality, struct Home * homeToRoam, struct Intake * intakeToRoam, int idElectricalDevice){
-    cout<<homeToRoam -> code << "\n";
-    if (homeToRoam == NULL)
-        return ;
-
-    recursiveTraversal(idLocality, homeToRoam -> next, intakeToRoam, idElectricalDevice);
-    cout<<"Entro aqui..\n";
-    intakeToRoam = homeToRoam -> firstI;
-    if (intakeToRoam == NULL)
-        return ;
-
-    recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice);
-
-    cout<<idLocality <<", "<<homeToRoam -> code <<", "<<intakeToRoam -> id<<", "<<idElectricalDevice<<"\t ";
-    struct electricalDevices * temp = searchED(idLocality, homeToRoam -> code, intakeToRoam -> id, idElectricalDevice);
-
-    if (temp == NULL){
-        return ;
-    }else{
-        cout<<temp -> intakeEnergyPerHour << "\n";
-        return;
-    }
-}
-*/
 
 void monthlyConsumptionOfADeviceInALocality(int idLocality, int idElectricalDevice){
     struct Locality * localityX = searchL(idLocality);
@@ -962,11 +934,7 @@ void monthlyConsumptionOfADeviceInALocality(int idLocality, int idElectricalDevi
         monthlyConsumption = recursiveTraversal(idLocality , localityX -> firstH, NULL, idElectricalDevice);
         cout<<"monthlyConsumption: "<<monthlyConsumption;
     }
-
-
-
 }
-
 
 
 ///-------------------------------- End Consult Methods ----------------------------------///
