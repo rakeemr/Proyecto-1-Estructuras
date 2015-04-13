@@ -49,15 +49,17 @@ struct Persons{
     string name;
     string lastName;
     int age;
+    double energyIntake;
     char intakeStandar;
     struct Persons *next;
     struct Persons *bef;
     struct personsIntake * linkPI;
-    Persons(int i, string n, string l, int a, char s){
+    Persons(int i, string n, string l, int a, double eI, char s){
         id = i;
         name = n;
         lastName = l;
         age = a;
+        energyIntake = eI;
         intakeStandar = s;
         next = NULL;
         bef = NULL;
@@ -113,12 +115,10 @@ struct electricalDevices{
 struct Energy{
     int id;
     string name;
-    int usagePercentage;
     struct Energy * next;
-    Energy(int i, string n, int uP){
+    Energy(int i, string n){
         id = i;
         name = n;
-        usagePercentage = uP;
         next = NULL;
     }
 }*firstE;
@@ -377,8 +377,14 @@ void insertHome(int idLocality ,int code, string address){
     }
 }
 
-void insertPerson(int id, string name, string lastName, int age, char intakeStandar){
-    struct Persons * nn = new Persons(id, name, lastName, age, intakeStandar);
+char standarClasification(double energyIntake){
+    if (energyIntake <)
+
+
+}
+
+void insertPerson(int id, string name, string lastName, int age, double energyIntake, char intakeStandar){
+    struct Persons * nn = new Persons(id, name, lastName, age, energyIntake ,intakeStandar);
     struct Persons * persoSearch = searchP(nn -> id);
 
     if (persoSearch != NULL){
@@ -432,8 +438,8 @@ void insertSector(int id, string type, string name,int percent){
     cout<<"Data Insert Correctly!\n";
 }
 
-void insertEnergy(int id, string name, int usagePercentage){
-    struct Energy * nn = new Energy(id, name, usagePercentage);
+void insertEnergy(int id, string name){
+    struct Energy * nn = new Energy(id, name);
     struct Energy * eneSearch = searchE(nn -> id);
 
     if (eneSearch != NULL){
@@ -773,8 +779,7 @@ void printEnergy(){
 	else{
 	    for(;temp != NULL; temp = temp->next){
                 cout<< temp -> id <<", ";
-            	cout<< temp -> name <<", ";
-            	cout<< temp -> usagePercentage <<". \n";
+            	cout<< temp -> name <<". \n";
 	    }
 	}
 }
@@ -933,6 +938,44 @@ void monthlyConsumptionOfADeviceInALocality(int idLocality, int idElectricalDevi
     }else{
         monthlyConsumption = recursiveTraversal(idLocality , localityX -> firstH, NULL, idElectricalDevice);
         cout<<"monthlyConsumption: "<<monthlyConsumption;
+    }
+}
+
+//struct Home *searchHomeInLocalitys
+
+
+struct Persons * mostConsumeristPerson(int idLocality, struct Home *homeToRoam){
+    if (homeToRoam == NULL)
+        return 0;
+    else{
+        if (intakeToRoam == NULL)
+            return 0 + (recursiveTraversal(idLocality, homeToRoam , homeToRoam -> firstI, idElectricalDevice));
+        else{
+            struct electricalDevices * temp = searchED(idLocality, homeToRoam -> code, intakeToRoam -> id, idElectricalDevice);
+            int consumption = 0;
+
+            if (temp != NULL)
+                consumption = temp -> intakeEnergyPerHour;
+
+            if  (intakeToRoam -> next != NULL)
+                return consumption + (recursiveTraversal(idLocality, homeToRoam, intakeToRoam -> next, idElectricalDevice));
+            else
+                return consumption + (recursiveTraversal(idLocality, homeToRoam -> next, intakeToRoam, idElectricalDevice));
+        }
+    }
+}
+
+void mostConsumeristPersonInHomeX(int idLocality, int codeHome){
+    struct Home * homX = searchH(idLocality, code);
+    struct Persons * person;
+
+    if (homX == NULL){
+        cout<<"\nThe Home doesn't exist...\n";
+        return ;
+    }else{
+        person = recursiveTraversal(idLocality , localityX -> firstH, NULL, idElectricalDevice);
+        cout<<"Most consumerist Person : " << person -> name;
+        cout<<"\nStandar : " << person -> intakeStandar;
     }
 }
 
